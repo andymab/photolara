@@ -1,22 +1,24 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-//import { Head, Link } from '@inertiajs/vue3'
+import PhotoList from '@/Components/Photo/Photolist1.vue'
+import { Head } from '@inertiajs/vue3'
 </script>
 
 <template>
   <Head title="Photo" />
   <AuthenticatedLayout>
     <div class="mb-5">
-      <h5 class="text-h5 font-weight-bold">Фотоальбомы</h5>
+      <h5 class="text-h5 font-weight-bold">Фото альбомы</h5>
       <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
     </div>
+    <PhotoList :data="data" />
   </AuthenticatedLayout>
 </template>
 
 <script>
 export default {
-  name: 'PeopleIndex',
+  name: 'PhotoIndex',
   props: {
     data: {
       type: Object,
@@ -31,7 +33,7 @@ export default {
           href: '/dashboard',
         },
         {
-          title: 'Фотоальбомы',
+          title: 'Фото альбомы',
           disabled: true,
         },
       ],

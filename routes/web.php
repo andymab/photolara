@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PeopleController;
+use App\Http\Controllers\PhotoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -27,6 +28,8 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/photos', [PhotoController::class, 'index'])->name('photos');
+Route::post('/photos/{id}', [PhotoController::class, 'save'])->name('photos_save');
 Route::resource('/people', PeopleController::class)->except(['show']);
 
 require __DIR__.'/auth.php';

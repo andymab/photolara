@@ -6,6 +6,11 @@ export default {
       to: '/dashboard',
     },
     {
+      title: 'Фото альбомы',
+      icon: 'mdi-account-group',
+      to: '/photos',
+    },
+    {
       title: 'People',
       icon: 'mdi-account-group',
       to: '/people',
