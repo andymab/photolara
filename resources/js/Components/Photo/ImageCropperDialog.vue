@@ -42,21 +42,24 @@ import 'cropperjs/dist/cropper.css'
 
 export default {
   name: 'ImageCropperDialog',
-  components: {
-    VueCropper,
-  },
   props: {
     chosenImage: {
       type: String,
       default: null,
     },
   },
+  emits: ['onReset', 'onCrop'],
   data() {
     return {
       ARatio: '16 / 9',
       showCropper: false,
       imageFileType: null,
     }
+  },
+  watch: {
+    chosenImage: function () {
+      this.initCropper(this.chosenImage.type)
+    },
   },
   methods: {
     async initCropper(imageFileType) {

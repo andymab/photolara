@@ -78,6 +78,7 @@ export default {
       default: () => '/assets/default.jpg',
     },
   },
+  emits: ['onReset'],
   data() {
     return {
       photo: {
@@ -122,7 +123,6 @@ export default {
       if (!event) return
       var file = event.target.files[0]
       this.chosenImage = await this.toBase64(file)
-      this.$refs.cropperDialog.initCropper(file.type)
     },
 
     async toBase64(file) {
