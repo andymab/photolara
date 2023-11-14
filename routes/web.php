@@ -29,7 +29,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/photos', [PhotoController::class, 'index'])->name('photos');
-Route::post('/photos/{id}', [PhotoController::class, 'save'])->name('photos_save');
+Route::post('/photos', [PhotoController::class, 'store'])->name('photos.store');
 Route::resource('/people', PeopleController::class)->except(['show']);
 
 require __DIR__.'/auth.php';

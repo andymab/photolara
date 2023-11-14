@@ -20,10 +20,10 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
             <!-- </v-avatar> -->
           </div>
           <v-container fluid class="px-0">
-            <v-text-field v-model="photo.title" clearable label="Наименование"></v-text-field>
+            <v-text-field v-model="formPhoto.title" clearable label="Наименование"></v-text-field>
             <v-textarea
               ref="descr"
-              v-model="photo.descr"
+              v-model="formPhoto.descr"
               label="Описание"
               auto-grow
               :rules="rules"
@@ -81,7 +81,7 @@ export default {
   emits: ['onReset'],
   data() {
     return {
-      photo: {
+      formPhoto: {
         id: '',
         photo_id: '',
         title: '',
@@ -89,7 +89,6 @@ export default {
       },
       titleImage: '',
       descrImage: '',
-      file: '',
       showPreview: false,
       imagePreview: '',
       avatarImage: this.srcpreview,
@@ -107,8 +106,8 @@ export default {
     },
   },
   created() {
-    this.photo.id = this.id
-    this.photo.photo_id = this.photo_id
+    this.formPhoto.id = this.id
+    this.formPhoto.photo_id = this.photo_id
   },
   mounted() {},
   methods: {
@@ -123,6 +122,7 @@ export default {
       if (!event) return
       var file = event.target.files[0]
       this.chosenImage = await this.toBase64(file)
+      this.$refs.cropperDialog.initCropper(file.type)
     },
 
     async toBase64(file) {
@@ -153,10 +153,11 @@ export default {
     },
     submitFile() {
       let formData = new FormData()
-      formData.append('file', this.file)
-      formData.append('photo', JSON.stringify(this.photo))
+      formData.append('base64', this.avatarImage)
+      formData.append('type_photo', 'cover')
+      formData.append('data', JSON.stringify(this.formPhoto))
       axios
-        .post('/savefilepreview', formData, {
+        .post('/photos', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },

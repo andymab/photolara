@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Photo;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class PhotoController extends Controller
@@ -37,7 +39,52 @@ class PhotoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $this->validate($request, [
+            'data' => ['required'],
+            'base64'=>['required'],
+            'type_photo'=>['required'],
+        ]);
+        list($type,$imagedata) = explode(",",$request->base64);
+        $image = base64_decode($imagedata);
+        $extend = mb_strpos($type,'jpeg') ? 'jpeg' : (mb_strpos($type,'png') ? 'png' : false);
+
+        if(!$extend){
+            return;
+        }
+
+        try {
+            $form = json_decode($request->data);
+        } catch (\Throwable $th) {
+            return $th;
+        }
+
+        if(empty($form->title)){
+            return;
+        }
+
+        $photo = Photo::create([
+        'title'=>$form->title,
+        'descr'=>$form->descr,
+        'user_id'=>auth()->user()->id,
+        'src_small'=>'',
+        'src_big'=>'',            
+        ]);
+
+      //  $path = storage_path('app/public/photos/'.auth()->user()->id."/".$photo->id);
+      $path = storage_path('app/public/photos/1/1');
+      log::info($path);
+        !is_dir($path) &&
+            mkdir($path, 0777, true);
+
+        Storage::disk('public')->put('photos/1/1/'. $photo->id.".".$extend, $image);
+
+        return 'ok';
+        // 'title',
+        // 'descr',
+        // 'user_id',
+        // 'src_small',
+        // 'src_big',
     }
 
     /**
