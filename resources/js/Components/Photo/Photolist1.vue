@@ -1,5 +1,6 @@
 <script setup>
 import FilePreviewDialog from './FilePreviewDialog.vue'
+import FullImageDialog from './FullImage.vue'
 </script>
 <template>
   <v-toolbar density="compact">
@@ -19,11 +20,11 @@ import FilePreviewDialog from './FilePreviewDialog.vue'
 
     <v-switch v-model="showtooltype" hide-details inset compact label="Показать описания"></v-switch>
   </v-toolbar>
+  <FullImageDialog :item="activItem" :is-show="isShowFullImage" @close-full-image="CloseFullImage" />
   <FilePreviewDialog
-    :id="activImageId"
     :activ-item="activItem"
     :dialog="showFilePreview"
-    :type="cover"
+    type="cover"
     @on-reset="showFilePreview = false"
   />
 
@@ -51,7 +52,7 @@ import FilePreviewDialog from './FilePreviewDialog.vue'
                           :data-title="item.title"
                           :data-descr="item.descr"
                           class="mr-2"
-                          @click="showFullImage"
+                          @click="showFullImage(item)"
                         ></v-icon>
                         <v-icon icon="mdi-newspaper-plus" class="mr-2" @click="showFilePreviewDialog(item)"></v-icon>
                         <!-- <RouterLink to="/images/1"> -->
@@ -77,7 +78,6 @@ import FilePreviewDialog from './FilePreviewDialog.vue'
 <script>
 import { mergeProps } from 'vue'
 import axios from 'axios'
-//import FullImage from './FullImage.vue'
 
 export default {
   name: 'PhotoList',
@@ -90,7 +90,7 @@ export default {
     activItem: {},
     activeSrc: '',
     activeTitle: '',
-    FullImage: false,
+    isShowFullImage: false,
     showtitle: false,
     items: [],
     showFilePreview: false,
@@ -105,16 +105,15 @@ export default {
   methods: {
     showFilePreviewDialog(item) {
       this.activItem = item
-      this.showFilePreview = 1
+      this.showFilePreview = true
     },
     mergeProps,
     CloseFullImage: function () {
-      this.FullImage = false
+      this.isShowFullImage = false
     },
-    showFullImage: function (e) {
-      this.activeSrc = e.target.dataset.src
-      this.activeTitle = e.target.dataset.title
-      this.FullImage = true
+    showFullImage: function (item) {
+      this.activItem = item
+      this.isShowFullImage = true
     },
     loadPhotos: function () {
       const self = this

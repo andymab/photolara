@@ -27,6 +27,7 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
               item-title="type"
               item-value="abbr"
               density="compact"
+              return-object
             ></v-select>
             <v-text-field v-model="formPhoto.title" clearable label="Наименование"></v-text-field>
             <v-textarea
