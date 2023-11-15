@@ -19,21 +19,24 @@ import FilePreviewDialog from './FilePreviewDialog.vue'
 
     <v-switch v-model="showtooltype" hide-details inset compact label="Показать описания"></v-switch>
   </v-toolbar>
-  <FilePreviewDialog :id="items.length" :dialog="showFilePreview" :photo_id="0" @on-reset="showFilePreview = false" />
+  <FilePreviewDialog
+    :id="activImageId"
+    :activ-item="activItem"
+    :dialog="showFilePreview"
+    :type="cover"
+    @on-reset="showFilePreview = false"
+  />
+
   <v-virtual-scroll :items="data" height="dynamic">
-    <template #default="{ item, index }">
+    <template #default="{ item }">
       <div class="row">
-        <div v-for="n in item" :key="index + '-' + n" class="image-block">
+        {{ item }}
+        <div class="image-block">
           <div class="image-content">
             <v-hover v-slot="{ isHovering, props }">
               <v-card :elevation="isHovering ? 4 : 2" v-bind="props">
-                <div
-                  :key="index + '-image-item-' + n"
-                  class="image-item"
-                  :class="{ active: isHovering || showtooltype }"
-                  v-bind="props"
-                >
-                  <v-img :src="n.src_tmb" :lazy-src="n.src_big" cover class="bg-grey-lighten-2 img-vue" height="220">
+                <div :key="item.id" class="image-item" :class="{ active: isHovering || showtooltype }" v-bind="props">
+                  <v-img :src="item.src_small" cover class="bg-grey-lighten-2 img-vue" height="220">
                     <template #placeholder>
                       <v-row class="fill-height ma-0" center justify="center">
                         <v-progress-circular indeterminate color="grey-lighten-5"></v-progress-circular>
@@ -44,17 +47,13 @@ import FilePreviewDialog from './FilePreviewDialog.vue'
                       <div class="d-flex px-2 image-toolbar">
                         <v-icon
                           icon="mdi-loupe"
-                          :data-src="n.src_big"
-                          :data-title="n.title"
-                          :data-descr="n.descr"
+                          :data-src="item.src_big ?? item.src_small"
+                          :data-title="item.title"
+                          :data-descr="item.descr"
                           class="mr-2"
                           @click="showFullImage"
                         ></v-icon>
-                        <v-icon
-                          icon="mdi-newspaper-plus"
-                          class="mr-2"
-                          @click="showFilePreviewDialog(n.src_tmb)"
-                        ></v-icon>
+                        <v-icon icon="mdi-newspaper-plus" class="mr-2" @click="showFilePreviewDialog(item)"></v-icon>
                         <!-- <RouterLink to="/images/1"> -->
                         <v-icon icon="mdi-exit-to-app"></v-icon>
                         <!-- </RouterLink> -->
@@ -62,7 +61,7 @@ import FilePreviewDialog from './FilePreviewDialog.vue'
                     </v-toolbar>
 
                     <div class="image-text-block">
-                      <h6>{{ n.title }} {{ n.descr }}</h6>
+                      <h6>{{ item.title }} {{ item.descr }}</h6>
                     </div>
                   </v-img>
                 </div>
@@ -88,6 +87,7 @@ export default {
     },
   },
   data: () => ({
+    activItem: {},
     activeSrc: '',
     activeTitle: '',
     FullImage: false,
@@ -103,6 +103,10 @@ export default {
     // console.log('---', this.items);
   },
   methods: {
+    showFilePreviewDialog(item) {
+      this.activItem = item
+      this.showFilePreview = 1
+    },
     mergeProps,
     CloseFullImage: function () {
       this.FullImage = false

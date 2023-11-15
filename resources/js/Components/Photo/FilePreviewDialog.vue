@@ -20,6 +20,14 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
             <!-- </v-avatar> -->
           </div>
           <v-container fluid class="px-0">
+            <v-select
+              v-model="selectType"
+              label="Выберите формат"
+              :items="selectItems"
+              item-title="type"
+              item-value="abbr"
+              density="compact"
+            ></v-select>
             <v-text-field v-model="formPhoto.title" clearable label="Наименование"></v-text-field>
             <v-textarea
               ref="descr"
@@ -36,6 +44,7 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
           <ImageCropperDialog
             ref="cropperDialog"
             :chosen-image="chosenImage"
+            :a-ratio="selectType"
             @on-reset="$refs.filePickerField.value = null"
             @on-crop="
               (croppedImage) => {
@@ -61,9 +70,9 @@ import axios from 'axios'
 export default {
   name: 'FilePreviewDialog',
   props: {
-    id: {
-      type: Number,
-      default: () => 0,
+    activItem: {
+      type: Object,
+      default: () => ({}),
     },
     photoId: {
       type: Number,
@@ -73,17 +82,21 @@ export default {
       type: Boolean,
       default: () => false,
     },
-    srcpreview: {
+    type: {
       type: String,
-      default: () => '/assets/default.jpg',
+      default: () => 'cover',
     },
   },
   emits: ['onReset'],
   data() {
     return {
+      selectType: { type: '4x3 Показ в группе', abbr: 'square' },
+      selectItems: [
+        { type: '4x3 Показ в группе', abbr: 'square' },
+        { type: '16x9 Показ для полного экрана', abbr: 'rectangle' },
+      ],
       formPhoto: {
         id: '',
-        photo_id: '',
         title: '',
         descr: '',
       },
@@ -101,8 +114,15 @@ export default {
     dialog: function () {
       this.showPreview = this.dialog
     },
-    srcpreview: function () {
-      this.avatarImage = this.srcpreview
+    activItem: function () {
+      if (this.activItem.src_small != undefined) {
+        this.avatarImage = this.activItem.src_small
+        this.formPhoto.id = this.activItem.id
+        this.formPhoto.title = this.activItem.title
+        this.formPhoto.descr = this.activItem.descr
+      } else {
+        this.avatarImage = '/assets/default.jpg'
+      }
     },
   },
   created() {
@@ -111,20 +131,18 @@ export default {
   },
   mounted() {},
   methods: {
-    async uploadBlob(base64) {
-      var link = document.createElement('a')
-      document.body.appendChild(link) // for Firefox
-      link.setAttribute('href', base64)
-      link.setAttribute('download', 'download.jpg')
-      link.click()
-    },
+    // async uploadBlob(base64) {
+    //   var link = document.createElement('a')
+    //   document.body.appendChild(link) // for Firefox
+    //   link.setAttribute('href', base64)
+    //   link.setAttribute('download', 'download.jpg')
+    //   link.click()
+    // },
     async launchCropper(event) {
       if (!event) return
       var file = event.target.files[0]
       this.chosenImage = await this.toBase64(file)
-      this.$refs.cropperDialog.initCropper(file.type)
     },
-
     async toBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader()
@@ -154,7 +172,8 @@ export default {
     submitFile() {
       let formData = new FormData()
       formData.append('base64', this.avatarImage)
-      formData.append('type_photo', 'cover')
+      formData.append('type_photos', this.type)
+      formData.append('type_image', this.selectType.abbr)
       formData.append('data', JSON.stringify(this.formPhoto))
       axios
         .post('/photos', formData, {

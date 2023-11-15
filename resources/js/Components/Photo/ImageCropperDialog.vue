@@ -6,12 +6,12 @@ import VueCropper from 'vue-cropperjs'
     <v-dialog v-model="showCropper" max-width="500" persistent>
       <v-card class="pt-6 pb-3">
         <v-card-title>
-          <v-toolbar density="compact" class="image-tools">
+          <!-- <v-toolbar density="compact" class="image-tools">
             <div class="d-flex justify-space-around">
               <v-btn size="small" variant="text" @click="$refs.cropper.setAspectRatio(1.77777)">16/9</v-btn>
               <v-btn size="small" variant="text" @click="$refs.cropper.setAspectRatio(1.33333)">4/3</v-btn>
             </div>
-          </v-toolbar>
+          </v-toolbar> -->
         </v-card-title>
         <v-card-text class="pb-3">
           <VueCropper
@@ -47,11 +47,14 @@ export default {
       type: String,
       default: null,
     },
+    aRatio: {
+      type: Object,
+      default: () => ({ type: '4x3 Показ в группе', abbr: 'square' }),
+    },
   },
   emits: ['onReset', 'onCrop'],
   data() {
     return {
-      ARatio: '16 / 9',
       showCropper: false,
       imageFileType: null,
     }
@@ -67,6 +70,11 @@ export default {
       this.imageFileType = imageFileType
       await new Promise((resolve) => setTimeout(resolve, 50))
       this.$refs.cropper.replace(this.chosenImage)
+      if (this.aRatio.abbr === 'square') {
+        this.$refs.cropper.setAspectRatio(1.33333)
+      } else {
+        this.$refs.cropper.setAspectRatio(1.77777)
+      }
     },
 
     async resetCropper() {
