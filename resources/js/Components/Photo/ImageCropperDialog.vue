@@ -43,6 +43,10 @@ import 'cropperjs/dist/cropper.css'
 export default {
   name: 'ImageCropperDialog',
   props: {
+    curfile: {
+      type: File,
+      default: null,
+    },
     chosenImage: {
       type: String,
       default: null,
@@ -61,7 +65,7 @@ export default {
   },
   watch: {
     chosenImage: function () {
-      this.initCropper(this.chosenImage.type)
+      this.initCropper(this.curfile.type)
     },
   },
   methods: {

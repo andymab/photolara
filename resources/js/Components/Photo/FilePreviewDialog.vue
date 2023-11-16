@@ -15,9 +15,7 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
           <input ref="filePickerField" type="file" accept="image/*" hidden @change="launchCropper" />
 
           <div style="height: 350px; width: 350px; border: 2px solid black">
-            <!-- <v-avatar size="350px" class="mt-5" style="border: 2px solid black;"> -->
             <v-img :src="avatarImage" class="avatar-image" @click="uploadBlob(avatarImage)"></v-img>
-            <!-- </v-avatar> -->
           </div>
           <v-container fluid class="px-0">
             <v-select
@@ -45,6 +43,7 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
           <ImageCropperDialog
             ref="cropperDialog"
             :chosen-image="chosenImage"
+            :curfile="curfile"
             :a-ratio="selectType"
             @on-reset="$refs.filePickerField.value = null"
             @on-crop="
@@ -54,13 +53,7 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
             "
           />
         </div>
-        <!-- <img v-bind:src="imagePreview" v-show="showPreview" /> -->
-        <!-- <input type="file" id="file" ref="file" accept="image/*" v-on:change="handleFileUpload()"/> -->
-        <!-- <button v-on:click="submitFile()">Submit</button> -->
       </v-card-text>
-      <!-- <v-card-actions>
-                <v-btn color="primary" block @click="dialog = false">Close Dialog</v-btn>
-            </v-card-actions> -->
     </v-card>
   </v-dialog>
 </template>
@@ -105,8 +98,10 @@ export default {
       descrImage: '',
       showPreview: false,
       imagePreview: '',
-      avatarImage: this.srcpreview,
+      avatarImage: '/assets/default.jpg',
       chosenImage: null,
+      curfile: null,
+      item: {},
 
       rules: [(v) => v.length <= 25 || 'Max 25 characters'],
     }
@@ -116,19 +111,18 @@ export default {
       this.showPreview = this.dialog
     },
     activItem: function () {
+      this.item = this.activItem
+      console.log('----', this.activItem)
       if (this.activItem.src_small != undefined) {
         this.avatarImage = this.activItem.src_small
         this.formPhoto.id = this.activItem.id
         this.formPhoto.title = this.activItem.title
         this.formPhoto.descr = this.activItem.descr
-      } else {
-        this.avatarImage = '/assets/default.jpg'
       }
     },
   },
   created() {
-    this.formPhoto.id = this.id
-    this.formPhoto.photo_id = this.photo_id
+    this.formPhoto.id = this.id ?? 0
   },
   mounted() {},
   methods: {
@@ -143,6 +137,7 @@ export default {
       if (!event) return
       var file = event.target.files[0]
       this.chosenImage = await this.toBase64(file)
+      this.curfile = file
     },
     async toBase64(file) {
       return new Promise((resolve, reject) => {
@@ -171,28 +166,33 @@ export default {
       }
     },
     submitFile() {
+      const self = this
       let formData = new FormData()
-      formData.append('base64', this.avatarImage)
-      formData.append('type_photos', this.type)
-      formData.append('type_image', this.selectType.abbr)
-      formData.append('data', JSON.stringify(this.formPhoto))
+      formData.append('type_photos', self.type)
+      formData.append('type_image', self.selectType.abbr)
+      formData.append('data', JSON.stringify(self.formPhoto))
+      formData.append('base64', self.avatarImage)
+
       axios
         .post('/photos', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         })
-        .then(function () {
+        .then(function (responce) {
+          console.log(responce.data)
           console.log('SUCCESS!!')
+          self.oncloseDialog(responce.data)
         })
-        .catch(function () {
-          console.log('FAILURE!!')
-        })
+      // .catch(function () {
+      //   console.log('FAILURE!!')
+      // })
     },
-    oncloseDialog() {
-      this.avatarImage = this.srcpreview
-      this.$refs.filePickerField.value = null
-      this.$emit('onReset')
+    oncloseDialog(data) {
+      const self = this
+      self.avatarImage = self.srcpreview
+      self.$refs.filePickerField.value = null
+      self.$emit('onReset', { item: data })
     },
   },
 }

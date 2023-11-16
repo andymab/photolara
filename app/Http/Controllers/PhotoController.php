@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Photo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -77,6 +78,8 @@ class PhotoController extends Controller
             $photo = Photo::create($data);
         } else {
             $photo = Photo::find($form->id);
+            $photo->title = $form->title;
+            $photo->descr =  $form->descr;
         }
 
         $path = storage_path('app/public/photos') . '/' . auth()->user()->id . '/' . $photo->id;
@@ -84,17 +87,27 @@ class PhotoController extends Controller
         !is_dir($path) &&
             mkdir($path, 0777, true);
 
-        $pathfile = 'photos/' . auth()->user()->id . '/' . $photo->id . '/' . $request->type_image . '-' . $photo->id . "." . $extend;
+
+        $pathfile = 'photos/' . auth()->user()->id . '/' . $photo->id . '/' . $request->type_image . '-' . $photo->id .'-'.time(). "." . $extend;
 
         Storage::disk('public')->put($pathfile, $image);
 
         if ($request->type_image == 'square') {
+            if($photo->src_small){
+                $this->deleteImage(str_replace("/storage/","",$photo->src_small));
+            }
             $photo->src_small = "/storage/" . $pathfile;
         } else {
+            if($photo->src_big){
+                $this->deleteImage(str_replace("/storage/","",$photo->src_big));
+            }
+
             $photo->src_big = "/storage/" . $pathfile;
         }
         $photo->save();
-        return 'ok';
+
+        return Response::json($photo);
+      
         // 'title',
         // 'descr',
         // 'user_id',
@@ -102,6 +115,18 @@ class PhotoController extends Controller
         // 'src_big',
     }
 
+    public function deleteImage($srcimage){
+        if(Storage::disk('public')->exists($srcimage)){
+            Storage::disk('public')->delete($srcimage);
+            /*
+                Delete Multiple files this way
+                Storage::delete(['upload/test.png', 'upload/test2.png']);
+            */
+            return true;
+        }else{
+            return false;
+        }
+    }
     /**
      * Display the specified resource.
      */

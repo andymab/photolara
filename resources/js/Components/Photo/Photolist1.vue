@@ -9,11 +9,7 @@ import FullImageDialog from './FullImage.vue'
     <v-spacer />
     <v-tooltip location="top">
       <template #activator="{ props: tooltip }">
-        <v-btn
-          icon="mdi-newspaper-plus"
-          v-bind="mergeProps(tooltip)"
-          @click="showFilePreview = !showFilePreview"
-        ></v-btn>
+        <v-btn icon="mdi-newspaper-plus" v-bind="mergeProps(tooltip)" @click="showFilePreviewDialog({}, 0)"></v-btn>
       </template>
       <span>Новый альбом</span>
     </v-tooltip>
@@ -21,54 +17,50 @@ import FullImageDialog from './FullImage.vue'
     <v-switch v-model="showtooltype" hide-details inset compact label="Показать описания"></v-switch>
   </v-toolbar>
   <FullImageDialog :item="activItem" :is-show="isShowFullImage" @close-full-image="CloseFullImage" />
-  <FilePreviewDialog
-    :activ-item="activItem"
-    :dialog="showFilePreview"
-    type="cover"
-    @on-reset="showFilePreview = false"
-  />
+  <FilePreviewDialog :activ-item="activItem" :dialog="showFilePreview" type="cover" @on-reset="onReset" />
 
-  <v-virtual-scroll :items="data" height="dynamic">
-    <template #default="{ item }">
-      <div class="row">
-        {{ item }}
-        <div class="image-block">
-          <div class="image-content">
-            <v-hover v-slot="{ isHovering, props }">
-              <v-card :elevation="isHovering ? 4 : 2" v-bind="props">
-                <div :key="item.id" class="image-item" :class="{ active: isHovering || showtooltype }" v-bind="props">
-                  <v-img :src="item.src_small" cover class="bg-grey-lighten-2 img-vue" height="220">
-                    <template #placeholder>
-                      <v-row class="fill-height ma-0" center justify="center">
-                        <v-progress-circular indeterminate color="grey-lighten-5"></v-progress-circular>
-                      </v-row>
-                    </template>
+  <v-virtual-scroll :items="selfdata" height="dynamic" class="list-item">
+    <template #default="{ item, index }">
+      <div class="image-block">
+        <div class="image-content">
+          <v-hover v-slot="{ isHovering, props }">
+            <v-card :elevation="isHovering ? 4 : 2" v-bind="props">
+              <div :key="item.id" class="image-item" :class="{ active: isHovering || showtooltype }" v-bind="props">
+                <v-img :src="item.src_small" cover class="bg-grey-lighten-2 img-vue" height="220">
+                  <template #placeholder>
+                    <v-row class="fill-height ma-0" center justify="center">
+                      <v-progress-circular indeterminate color="grey-lighten-5"></v-progress-circular>
+                    </v-row>
+                  </template>
 
-                    <v-toolbar density="compact">
-                      <div class="d-flex px-2 image-toolbar">
-                        <v-icon
-                          icon="mdi-loupe"
-                          :data-src="item.src_big ?? item.src_small"
-                          :data-title="item.title"
-                          :data-descr="item.descr"
-                          class="mr-2"
-                          @click="showFullImage(item)"
-                        ></v-icon>
-                        <v-icon icon="mdi-newspaper-plus" class="mr-2" @click="showFilePreviewDialog(item)"></v-icon>
-                        <!-- <RouterLink to="/images/1"> -->
-                        <v-icon icon="mdi-exit-to-app"></v-icon>
-                        <!-- </RouterLink> -->
-                      </div>
-                    </v-toolbar>
-
-                    <div class="image-text-block">
-                      <h6>{{ item.title }} {{ item.descr }}</h6>
+                  <v-toolbar density="compact">
+                    <div class="d-flex px-2 image-toolbar">
+                      <v-icon
+                        icon="mdi-loupe"
+                        :data-src="item.src_big ?? item.src_small"
+                        :data-title="item.title"
+                        :data-descr="item.descr"
+                        class="mr-2"
+                        @click="showFullImage(item)"
+                      ></v-icon>
+                      <v-icon
+                        icon="mdi-newspaper-plus"
+                        class="mr-2"
+                        @click="showFilePreviewDialog(item, index)"
+                      ></v-icon>
+                      <!-- <RouterLink to="/images/1"> -->
+                      <v-icon icon="mdi-exit-to-app"></v-icon>
+                      <!-- </RouterLink> -->
                     </div>
-                  </v-img>
-                </div>
-              </v-card>
-            </v-hover>
-          </div>
+                  </v-toolbar>
+
+                  <div class="image-text-block">
+                    <h6>{{ item.title }} {{ item.descr }}</h6>
+                  </div>
+                </v-img>
+              </div>
+            </v-card>
+          </v-hover>
         </div>
       </div>
     </template>
@@ -77,7 +69,7 @@ import FullImageDialog from './FullImage.vue'
 
 <script>
 import { mergeProps } from 'vue'
-import axios from 'axios'
+//import axios from 'axios'
 
 export default {
   name: 'PhotoList',
@@ -93,19 +85,34 @@ export default {
     isShowFullImage: false,
     showtitle: false,
     items: [],
+    selfdata: {},
+    selfItemKey: 0,
     showFilePreview: false,
     showtooltype: false,
   }),
-  created() {},
+  created() {
+    this.selfdata = this.data
+  },
   mounted() {
     // console.log('---', this.items);
     // this.loadPhotos();
     // console.log('---', this.items);
   },
   methods: {
-    showFilePreviewDialog(item) {
+    showFilePreviewDialog(item, index) {
       this.activItem = item
+      this.selfItemKey = index
       this.showFilePreview = true
+    },
+    onReset(data) {
+      this.showFilePreview = false
+      if (data) {
+        if (this.selfItemKey) {
+          this.selfdata[this.selfItemKey] = data.item
+        } else {
+          this.selfdata.push(data.item)
+        }
+      }
     },
     mergeProps,
     CloseFullImage: function () {
@@ -115,28 +122,34 @@ export default {
       this.activItem = item
       this.isShowFullImage = true
     },
-    loadPhotos: function () {
-      const self = this
-      let formData = new FormData()
-      formData.append('photo', JSON.stringify({ action: 'getphotos' }))
+    // loadPhotos: function () {
+    //   const self = this
+    //   let formData = new FormData()
+    //   formData.append('photo', JSON.stringify({ action: 'getphotos' }))
 
-      axios
-        .post('/Photos', formData)
-        .then(function (responce) {
-          const $items = responce.data
-          console.log($items)
-          self.items = $items.data
-          console.log('SUCCESS!!')
-        })
-        .catch(function (error) {
-          console.log(error)
-        })
-    },
+    //   axios
+    //     .post('/Photos', formData)
+    //     .then(function (responce) {
+    //       const $items = responce.data
+    //       console.log($items)
+    //       self.items = $items.data
+    //       console.log('SUCCESS!!')
+    //     })
+    //     .catch(function (error) {
+    //       console.log(error)
+    //     })
+    // },
   },
 }
 </script>
 
 <style>
+.v-virtual-scroll__container {
+  display: flex;
+}
+.v-virtual-scroll__item {
+  flex: 25%;
+}
 .v-theme--light .image-item header {
   background-color: transparent;
   color: floralwhite;
@@ -167,8 +180,8 @@ export default {
 
 .image-block {
   position: relative;
-  flex: 25%;
-  max-width: 25%;
+  /* flex: 25%; */
+  /* max-width: 25%; */
   padding: 0 4px;
   text-align: center;
 }
