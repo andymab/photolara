@@ -29,7 +29,7 @@ import NavigationMenu from '@/Components/NavigationMenu.vue'
 </template>
 
 <script>
-import md5 from 'crypto-js/md5'
+//import md5 from 'crypto-js/md5'
 import { useToast } from 'vue-toastification'
 
 export default {
@@ -41,7 +41,7 @@ export default {
   },
   computed: {
     avatar() {
-      return `https://www.gravatar.com/avatar/${md5(this.$page.props.auth.user.email)}?s=200`
+      return `/assets/default.jpg`
     },
   },
   watch: {

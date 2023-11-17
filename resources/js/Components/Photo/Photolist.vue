@@ -48,7 +48,7 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
                   lazy-src="/assets/default.jpg"
                   cover
                   class="bg-grey-lighten-2 img-vue"
-                  height="220"
+                  width="280"
                 >
                   <template #placeholder>
                     <v-row class="fill-height ma-0 block-loaded" center justify="center">
@@ -300,5 +300,10 @@ export default {
     flex: 100%;
     max-width: 100%;
   }
+}
+
+.list-item > .v-virtual-scroll__container {
+  flex-wrap: wrap;
+  padding: 0 4px;
 }
 </style>

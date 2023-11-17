@@ -113,7 +113,7 @@ class PhotoController extends Controller
         }
 
         $photoItem->save();
-        return Response::json($photo);
+        return Response::json($photoItem);
     }
 
 
