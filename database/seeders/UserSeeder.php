@@ -18,9 +18,9 @@ class UserSeeder extends Seeder
             return;
         }
         User::create([
-            'name' => 'John Doe',
-            'email' => 'johndoe@mail.com',
-            'password' => Hash::make('password')
+            'name' => 'Minaev Andy',
+            'email' => '650517@355000.ru',
+            'password' => Hash::make('!@txt472!')
         ]);
     }
 }
