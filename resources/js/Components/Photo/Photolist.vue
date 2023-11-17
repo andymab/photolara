@@ -48,7 +48,7 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
                   lazy-src="/assets/default.jpg"
                   cover
                   class="bg-grey-lighten-2 img-vue"
-                  width="280"
+                  heigrh="420"
                 >
                   <template #placeholder>
                     <v-row class="fill-height ma-0 block-loaded" center justify="center">
