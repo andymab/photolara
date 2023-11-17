@@ -45,7 +45,7 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
             :chosen-image="chosenImage"
             :curfile="curfile"
             :a-ratio="selectType"
-            @on-reset="$refs.filePickerField.value = null"
+            @on-reset="onReset"
             @on-crop="
               (croppedImage) => {
                 avatarImage = croppedImage
@@ -112,12 +112,16 @@ export default {
     },
     activItem: function () {
       this.item = this.activItem
-      console.log('----', this.activItem)
       if (this.activItem.src_small != undefined) {
         this.avatarImage = this.activItem.src_small
         this.formPhoto.id = this.activItem.id
         this.formPhoto.title = this.activItem.title
         this.formPhoto.descr = this.activItem.descr
+      } else {
+        this.avatarImage = '/assets/default.jpg'
+        this.formPhoto.id = 0
+        this.formPhoto.title = ''
+        this.formPhoto.descr = ''
       }
     },
   },
@@ -133,8 +137,13 @@ export default {
     //   link.setAttribute('download', 'download.jpg')
     //   link.click()
     // },
+    onReset: function () {
+      this.$refs.filePickerField.value = null
+    },
     async launchCropper(event) {
       if (!event) return
+
+      this.chosenImage = '/assets/default.jpg' //именно на смене картики стоит whach если одна и таже то не работало
       var file = event.target.files[0]
       this.chosenImage = await this.toBase64(file)
       this.curfile = file
@@ -172,15 +181,19 @@ export default {
       formData.append('type_image', self.selectType.abbr)
       formData.append('data', JSON.stringify(self.formPhoto))
       formData.append('base64', self.avatarImage)
-
+      let link = '/photos'
+      console.log(self.photoId)
+      if (self.photoId) {
+        link = '/photos/' + self.photoId
+      }
       axios
-        .post('/photos', formData, {
+        .post(link, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
         })
         .then(function (responce) {
-          console.log(responce.data)
+          //console.log(responce.data)
           console.log('SUCCESS!!')
           self.oncloseDialog(responce.data)
         })
@@ -190,7 +203,7 @@ export default {
     },
     oncloseDialog(data) {
       const self = this
-      self.avatarImage = self.srcpreview
+      self.avatarImage = null //self.srcpreview
       self.$refs.filePickerField.value = null
       self.$emit('onReset', { item: data })
     },

@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue'
 import Breadcrumbs from '@/Components/Breadcrumbs.vue'
-import PhotoList from '@/Components/Photo/Photolist1.vue'
+import PhotoList from '@/Components/Photo/Photolist.vue'
 import { Head } from '@inertiajs/vue3'
 </script>
 
@@ -12,7 +12,7 @@ import { Head } from '@inertiajs/vue3'
       <h5 class="text-h5 font-weight-bold">Фото альбомы</h5>
       <Breadcrumbs :items="breadcrumbs" class="pa-0 mt-1" />
     </div>
-    <PhotoList :data="data" />
+    <PhotoList :data="data" :photo="photo" />
   </AuthenticatedLayout>
 </template>
 
@@ -20,8 +20,13 @@ import { Head } from '@inertiajs/vue3'
 export default {
   name: 'PhotoIndex',
   props: {
+    photo: {
+      type: Object,
+      default: () => ({}),
+    },
     data: {
       type: Object,
+      default: () => ({}),
     },
   },
   data() {
@@ -32,11 +37,25 @@ export default {
           disabled: false,
           href: '/dashboard',
         },
-        {
-          title: 'Фото альбомы',
-          disabled: true,
-        },
       ],
+    }
+  },
+  created() {
+    if (Object.keys(this.photo).length == 0) {
+      this.breadcrumbs.push({
+        title: 'Фото альбомы',
+        disabled: true,
+      })
+    } else {
+      this.breadcrumbs.push({
+        title: 'Фото альбомы',
+        disabled: false,
+        href: '/photos',
+      })
+      this.breadcrumbs.push({
+        title: this.photo.title,
+        disabled: true,
+      })
     }
   },
   methods: {},
