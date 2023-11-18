@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Intervention\Image\Facades\Image as ResizeImage;
 
 class PhotoController extends Controller
 {
@@ -33,14 +34,15 @@ class PhotoController extends Controller
      */
     public function getItems(Photo $photo)
     {
-       
+
         return Inertia::render('Photo/Index', [
-            'photo'=> $photo,
+            'photo' => $photo,
             'data' => $photo->photos
         ]);
-    }   
-    
-    public function storeItems(Photo $photo,Request $request){
+    }
+
+    public function storeItems(Photo $photo, Request $request)
+    {
 
         //type_image = square/rectangle
         //type_photos = cover/page
@@ -74,7 +76,7 @@ class PhotoController extends Controller
         }
 
         $data = [
-            'photo_id'=>$photo->id,
+            'photo_id' => $photo->id,
             'title' => $form->title,
             'descr' => $form->descr,
             'user_id' => auth()->user()->id,
@@ -132,18 +134,6 @@ class PhotoController extends Controller
             'type_image' => ['required'],
         ]);
 
-        $image = null;
-        if (mb_strpos($request->base64, 'base64')) {
-            list($type, $imagedata) = explode(",", $request->base64);
-            $image = base64_decode($imagedata);
-            $extend = mb_strpos($type, 'jpeg') ? 'jpeg' : (mb_strpos($type, 'png') ? 'png' : false);
-
-            if (!$extend) {
-                return;
-            }
-        }
-
-
         try {
             $form = json_decode($request->data);
         } catch (\Throwable $th) {
@@ -151,6 +141,27 @@ class PhotoController extends Controller
         }
 
         if (empty($form->title)) {
+            return;
+        }
+
+        $image = null;
+        if (mb_strpos($request->base64, 'base64')) {
+            $image = ResizeImage::make($request->base64);
+            list($type, $extend) = explode("/", $image->mime());
+            if ($type != 'image') {
+                return;
+            }
+     
+            if ($request->type_image == 'square') {
+                $image->resize(800, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+            } else {
+                $image->resize(1200, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+            }
+        }else{
             return;
         }
 
@@ -176,7 +187,8 @@ class PhotoController extends Controller
 
             $pathfile = 'photos/' . auth()->user()->id . '/' . $photo->id . '/' . $request->type_image . '-' . $photo->id . '-' . time() . "." . $extend;
 
-            Storage::disk('public')->put($pathfile, $image);
+            $image->save($path.'/'.$request->type_image . '-' . $photo->id . '-' . time() . "." . $extend,90);
+            //Storage::disk('public')->put($pathfile, $image);
 
             if ($request->type_image == 'square') {
                 if ($photo->src_small) {
@@ -216,5 +228,4 @@ class PhotoController extends Controller
             return false;
         }
     }
-
 }

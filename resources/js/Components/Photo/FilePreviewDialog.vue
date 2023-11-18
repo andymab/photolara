@@ -3,7 +3,7 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
 </script>
 
 <template>
-  <v-dialog v-model="showPreview" width="auto">
+  <v-dialog v-model="showPreview" v-click-outside="oncloseDialog" width="auto">
     <v-card>
       <v-card-title class="d-flex justify-space-between align-center">
         <span> File Upload Preview.</span>
@@ -19,6 +19,7 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
           </div>
           <v-container fluid class="px-0">
             <v-select
+              v-if="activItem.id"
               v-model="selectType"
               label="Выберите формат"
               :items="selectItems"
@@ -38,7 +39,12 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
             ></v-textarea>
 
             <v-btn class="mr-2" @click="$refs.filePickerField.click()"> Загрузить </v-btn>
-            <v-btn class="" @click="submitFile()"> Save php </v-btn>
+            <v-btn class="" @click="submitFile()">
+              <div class="text-center" width="100%">
+                <span class="mr-4">Save php</span
+                ><v-progress-circular v-if="loading" indeterminate color="primary"></v-progress-circular>
+              </div>
+            </v-btn>
           </v-container>
           <ImageCropperDialog
             ref="cropperDialog"
@@ -84,6 +90,7 @@ export default {
   emits: ['onReset'],
   data() {
     return {
+      loading: false,
       selectType: { type: '4x3 Показ в группе', abbr: 'square' },
       selectItems: [
         { type: '4x3 Показ в группе', abbr: 'square' },
@@ -175,6 +182,7 @@ export default {
       }
     },
     submitFile() {
+      this.loading = true
       const self = this
       let formData = new FormData()
       formData.append('type_photos', self.type)
@@ -182,7 +190,6 @@ export default {
       formData.append('data', JSON.stringify(self.formPhoto))
       formData.append('base64', self.avatarImage)
       let link = '/photos'
-      console.log(self.photoId)
       if (self.photoId) {
         link = '/photos/' + self.photoId
       }
@@ -195,6 +202,7 @@ export default {
         .then(function (responce) {
           //console.log(responce.data)
           console.log('SUCCESS!!')
+          self.loading = false
           self.oncloseDialog(responce.data)
         })
       // .catch(function () {

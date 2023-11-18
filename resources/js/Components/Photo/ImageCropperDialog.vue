@@ -3,7 +3,7 @@ import VueCropper from 'vue-cropperjs'
 </script>
 <template>
   <div class="crop-image-dialog">
-    <v-dialog v-model="showCropper" max-width="500" persistent>
+    <v-dialog v-model="showCropper" v-click-outside="resetCropper" max-width="500" persistent>
       <v-card class="pt-6 pb-3">
         <v-card-title>
           <!-- <v-toolbar density="compact" class="image-tools">
