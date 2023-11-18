@@ -3,7 +3,7 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
 </script>
 
 <template>
-  <v-dialog v-model="showPreview" v-click-outside="oncloseDialog" width="auto">
+  <v-dialog v-model="showPreview" width="auto" persistent>
     <v-card>
       <v-card-title class="d-flex justify-space-between align-center">
         <span> File Upload Preview.</span>
@@ -15,7 +15,7 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
           <input ref="filePickerField" type="file" accept="image/*" hidden @change="launchCropper" />
 
           <div style="height: 350px; width: 350px; border: 2px solid black">
-            <v-img :src="avatarImage" class="avatar-image" @click="uploadBlob(avatarImage)"></v-img>
+            <v-img :src="avatarImage" class="avatar-image"></v-img>
           </div>
           <v-container fluid class="px-0">
             <v-select
@@ -114,9 +114,14 @@ export default {
     }
   },
   watch: {
-    dialog: function () {
-      this.showPreview = this.dialog
+    dialog: function (val) {
+      this.showPreview = val
     },
+    // showPreview: function (val) {
+    //   if (val === false) {
+    //     this.oncloseDialog({})
+    //   }
+    // },
     activItem: function () {
       this.item = this.activItem
       if (this.activItem.src_small != undefined) {

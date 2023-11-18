@@ -122,7 +122,7 @@ export default {
     this.selfdata = this.data
   },
   mounted() {
-    console.log(this.photo)
+    //console.log(this.photo)
     // console.log('---', this.items);
     // this.loadPhotos();
     // console.log('---', this.items);
@@ -130,7 +130,6 @@ export default {
   methods: {
     showFilePreviewDialog(item, index) {
       this.activItem = item
-      //console.log('this.activItem', this.activItem)
       this.selfItemKey = index
       this.showFilePreview = true
     },
