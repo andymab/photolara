@@ -11,6 +11,11 @@ export default {
       to: '/photos',
     },
     {
+      title: 'Записи',
+      icon: 'mdi-notebook',
+      to: '/photos',
+    },
+    {
       title: 'People',
       icon: 'mdi-account-group',
       to: '/people',
