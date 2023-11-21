@@ -7,7 +7,7 @@ export default {
     },
     {
       title: 'Фото альбомы',
-      icon: 'mdi-account-group',
+      icon: 'mdi-image-album',
       to: '/photos',
     },
     {

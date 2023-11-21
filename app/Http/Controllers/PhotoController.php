@@ -23,9 +23,19 @@ class PhotoController extends Controller
      */
     public function index(Request $request)
     {
-        $photos = Photo::where('user_id', auth()->user()->id)->get();
+
+        $query = Photo::query()->where('user_id', auth()->user()->id)->when($request->get('search'), function ($query, $search) {
+            return $query->where('title', 'LIKE', "%$search%");
+        });
+        $data = $query->get();
+        // })->when($request->get('sort'), function ($query, $sortBy) {
+        //     return $query->orderBy($sortBy['key'], $sortBy['order']);
+        // });
+
+
+        //$photos = Photo::where('user_id', auth()->user()->id)->get();
         return Inertia::render('Photo/Index', [
-            'data' => $photos
+            'data' => $data
         ]);
     }
 

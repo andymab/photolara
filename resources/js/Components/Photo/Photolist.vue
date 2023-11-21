@@ -7,7 +7,14 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
 <template>
   <v-toolbar density="compact">
     <!-- <v-toolbar-title>Фотоальбомы</v-toolbar-title> -->
-    <v-text-field hide-details prepend-icon="mdi-magnify" single-line placeholder="...Найти"></v-text-field>
+    <span class="mr-4"></span>
+    <v-text-field
+      v-model="search"
+      hide-details
+      prepend-icon="mdi-magnify"
+      single-line
+      placeholder="...Найти"
+    ></v-text-field>
     <v-spacer />
     <v-tooltip location="top">
       <template #activator="{ props: tooltip }">
@@ -21,7 +28,7 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
       </template>
       <span>Slaider</span>
     </v-tooltip>
-    <v-switch v-model="showtooltype" hide-details inset compact label="Показать описания"></v-switch>
+    <v-switch v-model="showtooltype" hide-details color="primary" inset compact label="Показать описания"></v-switch>
   </v-toolbar>
 
   <FullImageDialog :item="activItem" :is-show="isShowFullImage" @close-full-image="CloseFullImage" />
@@ -36,7 +43,14 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
 
   <SlaiderPhoto :is-show="sliderShow" :images="selfdata" @close-slaider="sliderShow = !sliderShow" />
 
-  <v-virtual-scroll :items="selfdata" height="dynamic" class="list-item">
+  <v-virtual-scroll
+    :items="selfdata"
+    height="dynamic"
+    class="list-item"
+    :search="search"
+    :loading="isLoadingImages"
+    @update:search="loadItems"
+  >
     <template #default="{ item, index }">
       <div class="image-block">
         <div class="image-content">
@@ -106,6 +120,8 @@ export default {
     },
   },
   data: () => ({
+    search: null,
+    isLoadingImages: false,
     activItem: {},
     activeSrc: '',
     activeTitle: '',
@@ -118,16 +134,39 @@ export default {
     showFilePreview: false,
     showtooltype: false,
   }),
+  watch: {
+    search: function (val) {
+      this.loadItems(val)
+    },
+  },
   created() {
     this.selfdata = this.data
   },
+
   mounted() {
     //console.log(this.photo)
     // console.log('---', this.items);
     // this.loadPhotos();
     // console.log('---', this.items);
   },
+
   methods: {
+    loadItems: function (search) {
+      console.log('sdfsdds')
+      this.isLoadingImages = true
+      var params = {}
+      if (search) {
+        params.search = search
+      }
+      this.$inertia.get('/photos', params, {
+        preserveState: true,
+        preserveScroll: true,
+        onSuccess: (resp) => {
+          this.isLoadingImages = false
+          this.selfdata = resp.props.data
+        },
+      })
+    },
     showFilePreviewDialog(item, index) {
       this.activItem = item
       this.selfItemKey = index
