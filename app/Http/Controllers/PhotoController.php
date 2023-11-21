@@ -47,7 +47,7 @@ class PhotoController extends Controller
         $query = PhotoItem::query()->where('photo_id', $photo->id)->when($request->get('search'), function ($query, $search) {
             return $query->where('title', 'LIKE', "%$search%");
         });
-        
+
         $data = $query->get();
 
         return Inertia::render('Photo/Index', [
@@ -166,17 +166,40 @@ class PhotoController extends Controller
             if ($type != 'image') {
                 return;
             }
-     
+
+            $height = $image->height();
+            $width = $image->width();
+
             if ($request->type_image == 'square') {
-                $image->resize(800, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
+                if ($width > $height) {
+                    if ($width > 800) {
+                        $image->resize(800, null, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
+                    }
+                } else {
+                    if ($height > 800) {
+                        $image->resize(null, 800, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
+                    }
+                }
             } else {
-                $image->resize(1200, null, function ($constraint) {
-                    $constraint->aspectRatio();
-                });
+                if ($width > $height) {
+                    if ($width > 1200) {
+                        $image->resize(1200, null, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
+                    }
+                } else {
+                    if ($height > 1200) {
+                        $image->resize(null, 1200, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
+                    }
+                }
             }
-        }else{
+        } else {
             return;
         }
 
@@ -202,7 +225,7 @@ class PhotoController extends Controller
 
             $pathfile = 'photos/' . auth()->user()->id . '/' . $photo->id . '/' . $request->type_image . '-' . $photo->id . '-' . time() . "." . $extend;
 
-            $image->save($path.'/'.$request->type_image . '-' . $photo->id . '-' . time() . "." . $extend,90);
+            $image->save($path . '/' . $request->type_image . '-' . $photo->id . '-' . time() . "." . $extend, 90);
             //Storage::disk('public')->put($pathfile, $image);
 
             if ($request->type_image == 'square') {
