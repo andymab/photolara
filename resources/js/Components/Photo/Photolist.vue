@@ -5,101 +5,103 @@ import FullImageDialog from './FullImage.vue'
 import SlaiderPhoto from './SlaiderPhoto.vue'
 </script>
 <template>
-  <v-toolbar density="compact">
-    <!-- <v-toolbar-title>Фотоальбомы</v-toolbar-title> -->
-    <span class="mr-4"></span>
-    <v-text-field
-      v-model="search"
-      hide-details
-      prepend-icon="mdi-magnify"
-      single-line
-      placeholder="...Найти"
-    ></v-text-field>
-    <v-spacer />
-    <v-tooltip location="top">
-      <template #activator="{ props: tooltip }">
-        <v-btn icon="mdi-newspaper-plus" v-bind="mergeProps(tooltip)" @click="showFilePreviewDialog({}, false)"></v-btn>
-      </template>
-      <span>Новый альбом</span>
-    </v-tooltip>
-    <v-tooltip location="top">
-      <template #activator="{ props: tooltip }">
-        <v-btn icon="mdi-image-move" v-bind="mergeProps(tooltip)" @click="sliderShow = !sliderShow"></v-btn>
-      </template>
-      <span>Slaider</span>
-    </v-tooltip>
-    <v-switch v-model="showtooltype" hide-details color="primary" inset compact label="Показать описания"></v-switch>
-  </v-toolbar>
+  <div>
+    <v-toolbar density="compact">
+      <!-- <v-toolbar-title>Фотоальбомы</v-toolbar-title> -->
+      <span class="mr-4"></span>
+      <v-text-field
+        v-model="search"
+        hide-details
+        prepend-icon="mdi-magnify"
+        single-line
+        placeholder="...Найти"
+      ></v-text-field>
+      <v-spacer />
+      <v-tooltip location="top">
+        <template #activator="{ props: tooltip }">
+          <v-btn icon="mdi-newspaper-plus" v-bind="mergeProps(tooltip)" @click="showFilePreviewDialog({}, false)">
+          </v-btn>
+        </template>
+        <span>Новый альбом</span>
+      </v-tooltip>
+      <v-tooltip location="top">
+        <template #activator="{ props: tooltip }">
+          <v-btn icon="mdi-image-move" v-bind="mergeProps(tooltip)" @click="sliderShow = !sliderShow"></v-btn>
+        </template>
+        <span>Slaider</span>
+      </v-tooltip>
+      <v-switch v-model="showtooltype" hide-details color="primary" inset compact label="Показать описания"></v-switch>
+    </v-toolbar>
 
-  <FullImageDialog :item="activItem" :is-show="isShowFullImage" @close-full-image="CloseFullImage" />
+    <FilePreviewDialog
+      :activ-item="activItem"
+      :photo-id="Object.keys(photo).length > 0 ? photo.id : 0"
+      :dialog="showFilePreview"
+      type="cover"
+      @on-reset="onReset"
+    />
+    <FullImageDialog :item="activItem" :is-show="isShowFullImage" @close-full-image="CloseFullImage" />
 
-  <FilePreviewDialog
-    :activ-item="activItem"
-    :photo-id="Object.keys(photo).length > 0 ? photo.id : 0"
-    :dialog="showFilePreview"
-    type="cover"
-    @on-reset="onReset"
-  />
+    <SlaiderPhoto :is-show="sliderShow" :images="selfdata" @close-slaider="sliderShow = !sliderShow" />
 
-  <SlaiderPhoto :is-show="sliderShow" :images="selfdata" @close-slaider="sliderShow = !sliderShow" />
+    <v-virtual-scroll
+      :items="selfdata"
+      height="dynamic"
+      class="list-item"
+      :search="search"
+      :loading="isLoadingImages"
+      @update:search="loadItems"
+    >
+      <template #default="{ item, index }">
+        <div class="image-block">
+          <div class="image-content">
+            <v-hover v-slot="{ isHovering, props }">
+              <v-card :elevation="isHovering ? 4 : 2" v-bind="props">
+                <div :key="item.id" class="image-item" :class="{ active: isHovering || showtooltype }" v-bind="props">
+                  <v-img
+                    :src="item.src_small"
+                    lazy-src="/assets/default.jpg"
+                    cover
+                    class="bg-grey-lighten-2 img-vue"
+                    heigrh="420"
+                  >
+                    <template #placeholder>
+                      <v-row class="fill-height ma-0 block-loaded" center justify="center">
+                        <v-progress-circular indeterminate color="grey-lighten-5"></v-progress-circular>
+                      </v-row>
+                    </template>
 
-  <v-virtual-scroll
-    :items="selfdata"
-    height="dynamic"
-    class="list-item"
-    :search="search"
-    :loading="isLoadingImages"
-    @update:search="loadItems"
-  >
-    <template #default="{ item, index }">
-      <div class="image-block">
-        <div class="image-content">
-          <v-hover v-slot="{ isHovering, props }">
-            <v-card :elevation="isHovering ? 4 : 2" v-bind="props">
-              <div :key="item.id" class="image-item" :class="{ active: isHovering || showtooltype }" v-bind="props">
-                <v-img
-                  :src="item.src_small"
-                  lazy-src="/assets/default.jpg"
-                  cover
-                  class="bg-grey-lighten-2 img-vue"
-                  heigrh="420"
-                >
-                  <template #placeholder>
-                    <v-row class="fill-height ma-0 block-loaded" center justify="center">
-                      <v-progress-circular indeterminate color="grey-lighten-5"></v-progress-circular>
-                    </v-row>
-                  </template>
+                    <v-toolbar density="compact">
+                      <div class="d-flex px-2 image-toolbar">
+                        <v-icon
+                          icon="mdi-loupe"
+                          :data-src="item.src_big ?? item.src_small"
+                          :data-title="item.title"
+                          :data-descr="item.descr"
+                          class="mr-2"
+                          @click="showFullImage(item)"
+                        ></v-icon>
 
-                  <v-toolbar density="compact">
-                    <div class="d-flex px-2 image-toolbar">
-                      <v-icon
-                        icon="mdi-loupe"
-                        :data-src="item.src_big ?? item.src_small"
-                        :data-title="item.title"
-                        :data-descr="item.descr"
-                        class="mr-2"
-                        @click="showFullImage(item)"
-                      ></v-icon>
+                        <v-icon icon="mdi-newspaper" class="mr-2" @click="showFilePreviewDialog(item, index)"></v-icon>
 
-                      <v-icon icon="mdi-newspaper" class="mr-2" @click="showFilePreviewDialog(item, index)"></v-icon>
+                        <Link v-if="Object.keys(photo).length == 0" :href="'/photos/' + item.id">
+                          <v-icon icon="mdi-exit-to-app"> </v-icon>
+                        </Link>
+                      </div>
+                    </v-toolbar>
 
-                      <Link v-if="Object.keys(photo).length == 0" :href="'/photos/' + item.id">
-                        <v-icon icon="mdi-exit-to-app"> </v-icon>
-                      </Link>
+                    <div class="image-text-block">
+                      <h6>{{ item.title }} {{ item.descr }}</h6>
                     </div>
-                  </v-toolbar>
-
-                  <div class="image-text-block">
-                    <h6>{{ item.title }} {{ item.descr }}</h6>
-                  </div>
-                </v-img>
-              </div>
-            </v-card>
-          </v-hover>
+                  </v-img>
+                </div>
+              </v-card>
+            </v-hover>
+          </div>
         </div>
-      </div>
-    </template>
-  </v-virtual-scroll>
+      </template>
+    </v-virtual-scroll>
+  </div>
 </template>
 
 <script>
@@ -219,9 +221,9 @@ export default {
   align-items: center;
 }
 
-.v-virtual-scroll__container {
+/* .v-virtual-scroll__container {
   display: flex;
-}
+} */
 
 .v-virtual-scroll__item {
   flex: 25%;
