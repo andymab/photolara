@@ -42,12 +42,17 @@ class PhotoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function getItems(Photo $photo)
+    public function getItems(Photo $photo, Request $request)
     {
+        $query = PhotoItem::query()->where('photo_id', $photo->id)->when($request->get('search'), function ($query, $search) {
+            return $query->where('title', 'LIKE', "%$search%");
+        });
+        
+        $data = $query->get();
 
         return Inertia::render('Photo/Index', [
             'photo' => $photo,
-            'data' => $photo->photos
+            'data' => $data
         ]);
     }
 

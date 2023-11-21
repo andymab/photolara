@@ -152,13 +152,15 @@ export default {
 
   methods: {
     loadItems: function (search) {
-      console.log('sdfsdds')
       this.isLoadingImages = true
       var params = {}
       if (search) {
         params.search = search
       }
-      this.$inertia.get('/photos', params, {
+      console.log('-----')
+      console.log(this.photo)
+      let url = Object.keys(this.photo).length == 0 ? '/photos' : '/photos/' + this.photo.id
+      this.$inertia.get(url, params, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: (resp) => {
