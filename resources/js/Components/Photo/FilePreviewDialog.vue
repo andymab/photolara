@@ -47,7 +47,6 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
             </v-btn>
           </v-container>
           <ImageCropperDialog
-            ref="cropperDialog"
             :chosen-image="chosenImage"
             :curfile="curfile"
             :a-ratio="selectType"
@@ -130,6 +129,7 @@ export default {
         this.formPhoto.title = this.activItem.title
         this.formPhoto.descr = this.activItem.descr
       } else {
+        this.selectType = { type: '4x3 Показ в группе', abbr: 'square' }
         this.avatarImage = '/assets/default.jpg'
         this.formPhoto.id = 0
         this.formPhoto.title = ''
@@ -157,8 +157,8 @@ export default {
 
       this.chosenImage = '/assets/default.jpg' //именно на смене картики стоит whach если одна и таже то не работало
       var file = event.target.files[0]
-      this.chosenImage = await this.toBase64(file)
       this.curfile = file
+      this.chosenImage = await this.toBase64(file)
     },
     async toBase64(file) {
       return new Promise((resolve, reject) => {
@@ -216,7 +216,7 @@ export default {
     },
     oncloseDialog(data) {
       const self = this
-      self.avatarImage = null //self.srcpreview
+      self.avatarImage = '/assets/default.jpg'
       self.$refs.filePickerField.value = null
       self.$emit('onReset', { item: data })
     },
