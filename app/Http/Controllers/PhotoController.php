@@ -28,22 +28,26 @@ class PhotoController extends Controller
         $query = Photo::query()->where('user_id', auth()->user()->id)->when($request->get('search'), function ($query, $search) {
             return $query->where('title', 'LIKE', "%$search%");
         });
-        $newData = $query->get();
+        $newData = $query->get()->toArray();
+        Log::info(array_chunk($newData,4));
         // })->when($request->get('sort'), function ($query, $sortBy) {
         //     return $query->orderBy($sortBy['key'], $sortBy['order']);
         // });
-        $data = PhotoResource::collection($newData);
+       // $data = PhotoResource::collection($newData);
 
-        $perPage = 4;
-        $pages = (count($data) - 1) / $perPage;
-        Log::info(count($data));
-        for ($index = 0; $index <= $pages; $index++) {
-            $collections[] = $data->slice($index * $perPage, min($perPage, count($data) - $index * $perPage));
-        }
-        Log::info($collections);
+        // $perPage = 4;
+        // $pages = count($newData) / $perPage;
+        // // Log::info(count($data));
+        // $collections = [];
+        // for ($index = 0; $index <= $pages; $index++) {
+        //      $collections[] = $newData->slice($index * $perPage, min($perPage, count($newData) - $index * $perPage));
+        //  }
+        // // Log::info($collections);
+        // Log::info($collections);
+        //Log::info((new PhotoResource($newData))->toArray($request));
         //$photos = Photo::where('user_id', auth()->user()->id)->get();
         return Inertia::render('Photo/Index', [
-            'data' => $collections
+            'data' => $newData // array_chunk($newData,4)
         ]);
     }
 
