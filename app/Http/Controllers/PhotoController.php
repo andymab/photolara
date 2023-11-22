@@ -28,13 +28,13 @@ class PhotoController extends Controller
         $query = Photo::query()->where('user_id', auth()->user()->id)->when($request->get('search'), function ($query, $search) {
             return $query->where('title', 'LIKE', "%$search%");
         });
-        $newData = $query->get()->toArray();
-        Log::info(array_chunk($newData,4));
+        $newData = $query->get();
+        //Log::info(array_chunk($newData,4));
         // })->when($request->get('sort'), function ($query, $sortBy) {
         //     return $query->orderBy($sortBy['key'], $sortBy['order']);
         // });
-       // $data = PhotoResource::collection($newData);
-
+        $data = PhotoResource::collection($newData)->toArray($request);
+//log::info( [$data] );
         // $perPage = 4;
         // $pages = count($newData) / $perPage;
         // // Log::info(count($data));
@@ -47,7 +47,7 @@ class PhotoController extends Controller
         //Log::info((new PhotoResource($newData))->toArray($request));
         //$photos = Photo::where('user_id', auth()->user()->id)->get();
         return Inertia::render('Photo/Index', [
-            'data' => $newData // array_chunk($newData,4)
+            'data' => $data// array_chunk($data,4)
         ]);
     }
 
