@@ -52,14 +52,14 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
       :loading="isLoadingImages"
       @update:search="loadItems"
     >
-      <template #default="{ item, index }">
-        <div class="image-block">
+      <template #default="{ item, indexMain }">
+        <div v-for="{ image, index } in item" :key="indexMain + '-' + index" class="image-block">
           <div class="image-content">
             <v-hover v-slot="{ isHovering, props }">
               <v-card :elevation="isHovering ? 4 : 2" v-bind="props">
-                <div :key="item.id" class="image-item" :class="{ active: isHovering || showtooltype }" v-bind="props">
+                <div :key="image.id" class="image-item" :class="{ active: isHovering || showtooltype }" v-bind="props">
                   <v-img
-                    :src="item.src_small"
+                    :src="image.src_small"
                     lazy-src="/assets/default.jpg"
                     cover
                     class="bg-grey-lighten-2 img-vue"
@@ -75,23 +75,23 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
                       <div class="d-flex px-2 image-toolbar">
                         <v-icon
                           icon="mdi-loupe"
-                          :data-src="item.src_big ?? item.src_small"
-                          :data-title="item.title"
-                          :data-descr="item.descr"
+                          :data-src="image.src_big ?? image.src_small"
+                          :data-title="image.title"
+                          :data-descr="image.descr"
                           class="mr-2"
-                          @click="showFullImage(item)"
+                          @click="showFullImage(image)"
                         ></v-icon>
 
-                        <v-icon icon="mdi-newspaper" class="mr-2" @click="showFilePreviewDialog(item, index)"></v-icon>
+                        <v-icon icon="mdi-newspaper" class="mr-2" @click="showFilePreviewDialog(image, index)"></v-icon>
 
-                        <Link v-if="Object.keys(photo).length == 0" :href="'/photos/' + item.id">
+                        <Link v-if="Object.keys(photo).length == 0" :href="'/photos/' + image.id">
                           <v-icon icon="mdi-exit-to-app"> </v-icon>
                         </Link>
                       </div>
                     </v-toolbar>
 
                     <div class="image-text-block">
-                      <h6>{{ item.title }} {{ item.descr }}</h6>
+                      <h6>{{ image.title }} {{ image.descr }}</h6>
                     </div>
                   </v-img>
                 </div>

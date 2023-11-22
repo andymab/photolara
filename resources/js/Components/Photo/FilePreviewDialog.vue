@@ -129,6 +129,7 @@ export default {
         this.formPhoto.title = this.activItem.title
         this.formPhoto.descr = this.activItem.descr
       } else {
+        this.selectType = { type: '4x3 Показ в группе', abbr: 'square' }
         this.avatarImage = '/assets/default.jpg'
         this.formPhoto.id = 0
         this.formPhoto.title = ''
