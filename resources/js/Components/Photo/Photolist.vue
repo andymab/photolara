@@ -8,15 +8,11 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
   <div>
     <v-toolbar density="compact">
       <!-- <v-toolbar-title>Фотоальбомы</v-toolbar-title> -->
-      <span class="mr-4"></span>
-      <v-text-field
-        v-model="search"
-        hide-details
-        prepend-icon="mdi-magnify"
-        single-line
-        placeholder="...Найти"
-      ></v-text-field>
-      <v-spacer />
+      <span v-if="!mobile" class="mr-4"></span>
+      <v-responsive class="mx-auto" max-width="344">
+        <v-text-field v-model="search" hide-details single-line placeholder="...Найти"></v-text-field>
+      </v-responsive>
+      <v-spacer v-if="!mobile" />
       <v-tooltip location="top">
         <template #activator="{ props: tooltip }">
           <v-btn icon="mdi-newspaper-plus" v-bind="mergeProps(tooltip)" @click="showFilePreviewDialog({}, null, null)">
@@ -30,7 +26,15 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
         </template>
         <span>Slaider</span>
       </v-tooltip>
-      <v-switch v-model="showtooltype" hide-details color="primary" inset compact label="Показать описания"></v-switch>
+      <v-switch
+        v-if="!mobile"
+        v-model="showtooltype"
+        hide-details
+        color="primary"
+        inset
+        compact
+        label="Показать описания"
+      ></v-switch>
     </v-toolbar>
 
     <FilePreviewDialog
@@ -42,7 +46,7 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
     />
     <FullImageDialog :item="activItem" :is-show="isShowFullImage" @close-full-image="CloseFullImage" />
 
-    <SlaiderPhoto :is-show="sliderShow" :images="selfdata" @close-slaider="sliderShow = !sliderShow" />
+    <SlaiderPhoto :is-show="sliderShow" :images="data" @close-slaider="sliderShow = !sliderShow" />
     <div v-if="selfdata.length !== 0">
       <v-virtual-scroll
         :items="selfdata"
@@ -135,6 +139,7 @@ export default {
   },
   data: () => ({
     search: null,
+    mobile: false,
     isLoadingImages: false,
     activItem: {},
     activeSrc: '',
@@ -172,7 +177,11 @@ export default {
 
   methods: {
     splitChunks: function (data) {
-      const chunkSize = 5
+      let chunkSize = 5
+      if (window.innerWidth < 520) {
+        chunkSize = 1
+        this.mobile = true
+      }
       const chunks = []
 
       for (let i = 0; i < data.length; i += chunkSize) {
