@@ -11,6 +11,16 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
         <v-btn icon="$close" @click="oncloseDialog"> </v-btn>
       </v-card-title>
       <v-card-text>
+        <div
+          ref="target"
+          style="cursor: pointer"
+          class="divonpaste"
+          :class="onpasteActive ? 'active' : ''"
+          @paste="onPaste"
+          @click="onpasteActive = true"
+        >
+          Click here and use Control-V to paste the image.
+        </div>
         <div class="d-flex flex-column justify-center align-center fill-height">
           <input ref="filePickerField" type="file" accept="image/*" hidden @change="launchCropper" />
 
@@ -39,6 +49,7 @@ import ImageCropperDialog from './ImageCropperDialog.vue'
             ></v-textarea>
 
             <v-btn class="mr-2" @click="$refs.filePickerField.click()"> Загрузить </v-btn>
+
             <v-btn class="" @click="submitFile()">
               <div class="text-center" width="100%">
                 <span class="mr-4">Save php</span
@@ -89,10 +100,11 @@ export default {
   emits: ['onReset'],
   data() {
     return {
+      onpasteActive: false,
       loading: false,
-      selectType: { type: '4x3 Показ в группе', abbr: 'square' },
+      selectType: { type: '3X4 Показ в группе', abbr: 'square' },
       selectItems: [
-        { type: '4x3 Показ в группе', abbr: 'square' },
+        { type: '3X4 Показ в группе', abbr: 'square' },
         { type: '16x9 Показ для полного экрана', abbr: 'rectangle' },
       ],
       formPhoto: {
@@ -103,7 +115,7 @@ export default {
       titleImage: '',
       descrImage: '',
       showPreview: false,
-      imagePreview: '',
+      imagePreview: null,
       avatarImage: '/assets/default.jpg',
       chosenImage: null,
       curfile: null,
@@ -159,6 +171,7 @@ export default {
       var file = event.target.files[0]
       this.curfile = file
       this.chosenImage = await this.toBase64(file)
+      //console.log(this.chosenImage)
     },
     async toBase64(file) {
       return new Promise((resolve, reject) => {
@@ -168,25 +181,46 @@ export default {
         reader.onerror = (error) => reject(error)
       })
     },
+    async onPaste(event) {
+      const clipboardData = event.clipboardData || window.clipboardData
 
-    handleFileUpload() {
-      this.file = this.$refs.file.files[0]
-      let reader = new FileReader()
-      reader.addEventListener(
-        'load',
-        function () {
-          this.showPreview = true
-          this.imagePreview = reader.result
-        }.bind(this),
-        false,
-      )
-      if (this.file) {
-        if (/\.(jpe?g|png|gif)$/i.test(this.file.name)) {
-          reader.readAsDataURL(this.file)
-        }
-      }
+      const items = clipboardData.items
+      //      for (let i = 0; i < items.length; i++) {
+      //        if (items[i].type.indexOf('image') !== -1) {
+      const imageFile = items[0].getAsFile()
+      this.curfile = imageFile
+      this.chosenImage = await this.toBase64(imageFile)
+      //         this.processImage(imageFile)
+      //        }
+      //      }
     },
+    // processImage(imageFile) {
+    //   const reader = new FileReader()
+    //   reader.onload = (event) => {
+    //     this.showPreview = true
+    //     this.imagePreview = event.target.result
+    //   }
+    //   reader.readAsDataURL(imageFile)
+    // },
+    // handleFileUpload() {
+    //   this.file = this.$refs.file.files[0]
+    //   let reader = new FileReader()
+    //   reader.addEventListener(
+    //     'load',
+    //     function () {
+    //       this.showPreview = true
+    //       this.imagePreview = reader.result
+    //     }.bind(this),
+    //     false,
+    //   )
+    //   if (this.file) {
+    //     if (/\.(jpe?g|png|gif)$/i.test(this.file.name)) {
+    //       reader.readAsDataURL(this.file)
+    //     }
+    //   }
+    // },
     submitFile() {
+      this.onpasteActive = false
       this.loading = true
       const self = this
       let formData = new FormData()
@@ -216,6 +250,7 @@ export default {
     },
     oncloseDialog(data) {
       const self = this
+      self.onpasteActive = false
       self.avatarImage = '/assets/default.jpg'
       self.$refs.filePickerField.value = null
       self.$emit('onReset', { item: data })
@@ -228,5 +263,9 @@ export default {
 .container img {
   max-width: 200px;
   max-height: 200px;
+}
+.divonpaste:hover,
+.divonpaste.active {
+  border: 2px dashed rgb(112, 112, 228);
 }
 </style>

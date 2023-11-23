@@ -55,7 +55,7 @@ export default {
     },
     aRatio: {
       type: Object,
-      default: () => ({ type: '4x3 Показ в группе', abbr: 'square' }),
+      default: () => ({ type: '3X4 Показ в группе', abbr: 'square' }),
     },
   },
   emits: ['onReset', 'onCrop'],
@@ -77,7 +77,7 @@ export default {
       await new Promise((resolve) => setTimeout(resolve, 50))
       this.$refs.cropper.replace(this.chosenImage)
       if (this.aRatio.abbr === 'square') {
-        this.$refs.cropper.setAspectRatio(1.33333)
+        this.$refs.cropper.setAspectRatio(0.75)
       } else {
         this.$refs.cropper.setAspectRatio(1.77777)
       }

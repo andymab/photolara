@@ -69,7 +69,7 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
                         lazy-src="/assets/default.jpg"
                         cover
                         class="bg-grey-lighten-2 img-vue"
-                        height="320"
+                        height="300"
                       >
                         <template #placeholder>
                           <v-row class="fill-height ma-0 block-loaded" center justify="center">
@@ -172,7 +172,7 @@ export default {
 
   methods: {
     splitChunks: function (data) {
-      const chunkSize = 4
+      const chunkSize = 5
       const chunks = []
 
       for (let i = 0; i < data.length; i += chunkSize) {
@@ -210,7 +210,7 @@ export default {
       this.showFilePreview = false
       this.activItem = {}
       if (data.item.src_small) {
-        if (this.selfItemRow !== false) {
+        if (this.selfItemRow !== null) {
           this.selfdata[this.selfItemRow][this.selfItemCol] = data.item
         } else {
           this.items.push(data.item)
@@ -304,8 +304,8 @@ export default {
 
 .image-block {
   position: relative;
-  flex: 25%;
-  max-width: 25%;
+  flex: 20%;
+  max-width: 20%;
   padding: 0 4px;
   text-align: center;
 }

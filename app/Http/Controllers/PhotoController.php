@@ -91,7 +91,7 @@ class PhotoController extends Controller
 
         $image = null;
         if (mb_strpos($request->base64, 'base64')) {
-            $image = $this->createImage($request->base64, $request->type_image);
+            $image = $this->createImageJPG($request->base64, $request->type_image);
             list($type, $extend) = explode("/", $image->mime());
             if ($type != 'image') {
                 return;
@@ -173,11 +173,11 @@ class PhotoController extends Controller
 
         $image = null;
         if (mb_strpos($request->base64, 'base64')) {
-            $image = $this->createImage($request->base64, $request->type_image);
+            $image = $this->createImageJPG($request->base64, $request->type_image);            
             list($type, $extend) = explode("/", $image->mime());
             if ($type != 'image') {
                 return;
-            }
+            }            
         } else {
             return;
         }
@@ -213,9 +213,9 @@ class PhotoController extends Controller
         return Response::json($photo);
     }
 
-    public function createImage($src, $type)
+    public function createImageJPG($src, $type)
     {
-        $image = ResizeImage::make($src);
+        $image = ResizeImage::make($src)->encode('jpg', 85);
 
         $heigth =  $image->height();
         $width = $image->width();
