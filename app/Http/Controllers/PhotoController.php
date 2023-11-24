@@ -182,7 +182,7 @@ class PhotoController extends Controller
             $photo->save();
             return Response::json($photo);
         }
-
+ 
 
         if ($image) {
             $path = storage_path('app/public/photos') . '/' . auth()->user()->id . '/' . $photo->id;
