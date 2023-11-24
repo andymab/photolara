@@ -97,8 +97,8 @@ class PhotoController extends Controller
                 return;
             }
         } else {
-            $photo->save();
-            return Response::json($photo);
+            $photoItem->save();
+            return Response::json($photoItem);
         }
 
         if ($image) {
