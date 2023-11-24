@@ -179,7 +179,8 @@ class PhotoController extends Controller
                 return;
             }            
         } else {
-            return;
+            $photo->save();
+            return Response::json($photo);
         }
 
 

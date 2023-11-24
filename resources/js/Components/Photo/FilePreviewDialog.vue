@@ -121,7 +121,7 @@ export default {
       curfile: null,
       item: {},
 
-      rules: [(v) => v.length <= 25 || 'Max 25 characters'],
+      rules: [(v) => v.length <= 250 || 'Max 250 characters'],
     }
   },
   watch: {
