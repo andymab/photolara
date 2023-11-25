@@ -73,7 +73,7 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
                         lazy-src="/assets/default.jpg"
                         cover
                         class="bg-grey-lighten-2 img-vue"
-                        height="300"
+                        :height="imgheigth"
                       >
                         <template #placeholder>
                           <v-row class="fill-height ma-0 block-loaded" center justify="center">
@@ -138,6 +138,7 @@ export default {
     },
   },
   data: () => ({
+    imgheigth: 300,
     search: null,
     mobile: false,
     isLoadingImages: false,
@@ -181,6 +182,7 @@ export default {
       if (window.innerWidth < 520) {
         chunkSize = 1
         this.mobile = true
+        this.imgheigth = 420
       }
       const chunks = []
 
