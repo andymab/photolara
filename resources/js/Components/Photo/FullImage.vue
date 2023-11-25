@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialogShow" fullscreen :scrim="false" transition="dialog-bottom-transition">
     <div class="img-block-full">
-      <v-img :src="item.src_big ?? '/assets/default.jpg'" contain class="bg-grey-darken-4 img-full">
+      <v-img :src="item.src_big ?? item.src_small" contain class="bg-grey-darken-4 img-full">
         <template #placeholder>
           <v-row class="fill-height ma-0" align="center" justify="center">
             <v-progress-circular indeterminate color="black"></v-progress-circular>
