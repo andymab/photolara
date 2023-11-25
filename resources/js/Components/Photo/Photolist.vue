@@ -182,7 +182,7 @@ export default {
       if (window.innerWidth < 520) {
         chunkSize = 1
         this.mobile = true
-        this.imgheigth = 420
+        this.imgheigth = 440
       }
       const chunks = []
 
