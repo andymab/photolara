@@ -14,12 +14,14 @@ return new class extends Migration
         Schema::create('notes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('parent_id')->default(0)->index();
             $table->string("path_logo");
             $table->string('name',80)->unique();
             $table->string('slug',90)->unique(); //eng -> name
             $table->string('descr',255);
             $table->longText('post_md'); //post .md format
             $table->longText('post_js'); //js model when ID -> slug
+            $table-json('path_images'); //array path to images
             $table->timestamps();
             //также могуг быть прикреплены картинки note_images
         });
