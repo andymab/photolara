@@ -6,12 +6,14 @@ import VueCropper from 'vue-cropperjs'
     <v-dialog v-model="showCropper" max-width="500" persistent>
       <v-card class="pt-6 pb-3">
         <v-card-title>
-          <!-- <v-toolbar density="compact" class="image-tools">
+          <v-toolbar density="compact" class="image-tools">
             <div class="d-flex justify-space-around">
+              <v-btn size="small" variant="text" @click="$refs.cropper.setAspectRatio(0.5625)">9/16</v-btn>
               <v-btn size="small" variant="text" @click="$refs.cropper.setAspectRatio(1.77777)">16/9</v-btn>
+              <v-btn size="small" variant="text" @click="$refs.cropper.setAspectRatio(0.75)">3/4</v-btn>
               <v-btn size="small" variant="text" @click="$refs.cropper.setAspectRatio(1.33333)">4/3</v-btn>
             </div>
-          </v-toolbar> -->
+          </v-toolbar>
         </v-card-title>
         <v-card-text class="pb-3">
           <VueCropper

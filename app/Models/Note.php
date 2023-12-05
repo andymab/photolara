@@ -5,26 +5,42 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Note extends Model
 {
     use HasFactory;
-
     protected $fillable = [
-        'user_id',
-        'tree_key',
-        'title',
-        'description',
-        'images',
-        'note'
+        'path_logo',
+        'name',
+        'descr',
+        'post_md',
+        'post_js',
     ];
+
+    public static function boot(){
+        static::creating(function($model){
+            $model->slug = Str::slug($model->name, '-');
+        });
+    }
 
     protected $casts = [
-        'images' => 'array'
+        'path_images' => 'array',
     ];
 
-     /**
-     * Доступ к Пользователю
+    /** получить связанные модели на уровень ниже
+     * для получения всех моделей уровня требуется вызвать NoteWhithChildren
+     * например для построения BreadCrumbs найденых моделей
+     * @return HasMany
+     */
+    public function notes(): HasMany
+    {
+        return $this->hasMany(Note::class, 'parent_id', 'id');
+    }
+
+    /**
+     * Пользователь создавший заметку
      *
      * @return BelongsTo
      */
@@ -32,5 +48,4 @@ class Note extends Model
     {
         return $this->belongsTo(User::class);
     }
-
 }
