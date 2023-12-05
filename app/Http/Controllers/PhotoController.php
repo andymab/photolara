@@ -245,31 +245,31 @@ Log::info($collections);
         if ($type == 'square') {
 
             if ($width > $heigth) {
-                if ($width > 800) {
+                // if ($width > 800) {
                     $image->resize(800, null, function ($constraint) {
                         $constraint->aspectRatio();
                     });
-                }
+                // }
             } else {
-                if ($heigth > 800) {
+                // if ($heigth > 800) {
                     $image->resize(null, 800, function ($constraint) {
                         $constraint->aspectRatio();
                     });
-                }
+                // }
             }
         } else {
             if ($width > $heigth) {
-                if ($width > 1200) {
+                // if ($width > 1200) {
                     $image->resize(1200, null, function ($constraint) {
                         $constraint->aspectRatio();
                     });
-                }
+                // }
             } else {
-                if ($heigth > 1200) {
+                // if ($heigth > 1200) {
                     $image->resize(null, 1200, function ($constraint) {
                         $constraint->aspectRatio();
                     });
-                }
+                // }
             }
         }
 

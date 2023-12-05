@@ -205,7 +205,7 @@ export default {
           },
         })
         .then(function (responce) {
-          //console.log(responce.data)
+          console.log(responce.data)
           console.log('SUCCESS!!')
           self.loading = false
           self.oncloseDialog(responce.data)

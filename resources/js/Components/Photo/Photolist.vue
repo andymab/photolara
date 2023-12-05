@@ -53,65 +53,55 @@ import SlaiderPhoto from './SlaiderPhoto.vue'
       @update:search="loadItems"
     >
       <template #default="{ item, index }">
-        <div class="row">
-          <div v-for="img in item" :key="index + '-' + img" class="image-block">
-            <div class="image-block">
-              <div class="image-content">
-                <v-hover v-slot="{ isHovering, props }">
-                  <v-card :elevation="isHovering ? 4 : 2" v-bind="props">
-                    <div
-                      :key="img.id"
-                      class="image-item"
-                      :class="{ active: isHovering || showtooltype }"
-                      v-bind="props"
-                    >
-                      <v-img
-                        :src="img.src_small"
-                        lazy-src="/assets/default.jpg"
-                        cover
-                        class="bg-grey-lighten-2 img-vue"
-                        heigrh="420"
-                      >
-                        <template #placeholder>
-                          <v-row class="fill-height ma-0 block-loaded" center justify="center">
-                            <v-progress-circular indeterminate color="grey-lighten-5"></v-progress-circular>
-                          </v-row>
-                        </template>
+        <!-- <div class="row"> -->
+        <!-- <div v-for="img in item" :key="index + '-' + img" class="image-block"> -->
+        <div class="image-block">
+          <div class="image-content">
+            <v-hover v-slot="{ isHovering, props }">
+              <v-card :elevation="isHovering ? 4 : 2" v-bind="props">
+                <div :key="item.id" class="image-item" :class="{ active: isHovering || showtooltype }" v-bind="props">
+                  <v-img
+                    :src="item.src_small"
+                    lazy-src="/assets/default.jpg"
+                    cover
+                    class="bg-grey-lighten-2 img-vue"
+                    heigrh="420"
+                  >
+                    <template #placeholder>
+                      <v-row class="fill-height ma-0 block-loaded" center justify="center">
+                        <v-progress-circular indeterminate color="grey-lighten-5"></v-progress-circular>
+                      </v-row>
+                    </template>
 
-                        <v-toolbar density="compact">
-                          <div class="d-flex px-2 image-toolbar">
-                            <v-icon
-                              icon="mdi-loupe"
-                              :data-src="img.src_big ?? img.src_small"
-                              :data-title="img.title"
-                              :data-descr="img.descr"
-                              class="mr-2"
-                              @click="showFullImage(img)"
-                            ></v-icon>
+                    <v-toolbar density="compact">
+                      <div class="d-flex px-2 image-toolbar">
+                        <v-icon
+                          icon="mdi-loupe"
+                          :data-src="item.src_big ?? item.src_small"
+                          :data-title="item.title"
+                          :data-descr="item.descr"
+                          class="mr-2"
+                          @click="showFullImage(item)"
+                        ></v-icon>
 
-                            <v-icon
-                              icon="mdi-newspaper"
-                              class="mr-2"
-                              @click="showFilePreviewDialog(img, index)"
-                            ></v-icon>
+                        <v-icon icon="mdi-newspaper" class="mr-2" @click="showFilePreviewDialog(item, index)"></v-icon>
 
-                            <Link v-if="Object.keys(photo).length == 0" :href="'/photos/' + img.id">
-                              <v-icon icon="mdi-exit-to-app"> </v-icon>
-                            </Link>
-                          </div>
-                        </v-toolbar>
+                        <Link v-if="Object.keys(photo).length == 0" :href="'/photos/' + item.id">
+                          <v-icon icon="mdi-exit-to-app"> </v-icon>
+                        </Link>
+                      </div>
+                    </v-toolbar>
 
-                        <div class="image-text-block">
-                          <h6>{{ img.title }} {{ img.descr }}</h6>
-                        </div>
-                      </v-img>
+                    <div class="image-text-block">
+                      <h6>{{ item.title }} {{ item.descr }}</h6>
                     </div>
-                  </v-card>
-                </v-hover>
-              </div>
-            </div>
+                  </v-img>
+                </div>
+              </v-card>
+            </v-hover>
           </div>
         </div>
+        <!-- </div> -->
       </template>
     </v-virtual-scroll>
   </div>
@@ -155,7 +145,6 @@ export default {
     },
   },
   created() {
-    console.log(this.data)
     const chunkSize = 4
     const chunks = []
 
@@ -163,7 +152,7 @@ export default {
       const chunk = this.data.slice(i, i + chunkSize)
       chunks.push(chunk)
     }
-    this.selfdata = chunks
+    this.selfdata = this.data //chunks
   },
 
   mounted() {
@@ -180,8 +169,6 @@ export default {
       if (search) {
         params.search = search
       }
-      console.log('-----')
-      console.log(this.photo)
       let url = Object.keys(this.photo).length == 0 ? '/photos' : '/photos/' + this.photo.id
       this.$inertia.get(url, params, {
         preserveState: true,
@@ -246,10 +233,10 @@ export default {
   display: flex;
 } */
 
-.v-virtual-scroll__item {
+/* .v-virtual-scroll__item {
   flex: 25%;
   max-width: 25%;
-}
+} */
 
 .v-theme--light .image-item header {
   background-color: transparent;
@@ -293,7 +280,7 @@ export default {
 .image-block {
   position: relative;
   /* flex: 25%; */
-  /* max-width: 25%; */
+  max-width: 25%;
   padding: 0 4px;
   text-align: center;
 }
@@ -365,8 +352,8 @@ export default {
   }
 }
 
-.list-item > .v-virtual-scroll__container {
+/* .list-item > .v-virtual-scroll__container {
   flex-wrap: wrap;
   padding: 0 4px;
-}
+} */
 </style>
